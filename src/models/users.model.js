@@ -11,6 +11,7 @@ const Users = newSeq.define(`users`, {
         type: DataTypes.STRING,
         allowNull: false,
         defaultValue: "",
+        unique:true,
     },
     no_telp: {
         type: DataTypes.INTEGER,
