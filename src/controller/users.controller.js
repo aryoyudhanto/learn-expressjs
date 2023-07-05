@@ -35,27 +35,28 @@ export const getAllUsers = async (req, res) => {
 export const getUserById = async (req, res) => {
   try {
     const userId = req.params.id;
-
+    
     if (isNaN(userId)) {
-      return res.status(400).json({ error: 'ID harus berupa angka, misalnya 1-100.' });
-    }
-
-    if (userId === '1') {
-      return res.status(400).json({ error: 'Pengguna dengan ID tersebut tidak dapat dilihat' });
-    }
-
+        return res.status(400).json({ error: 'ID harus berupa angka, misalnya 1-100.' });
+      }
     const response = await Users.findOne({
       where: {
         id: userId,
       },
     });
 
-    if (!response) {
+    if (response === 0) {
       return res.status(400).json({ error: 'Pengguna dengan ID tersebut tidak dapat ditemukan.' });
     }
+    else {
+      if (response === 1) {
+        return res.status(400).json({ error: 'Pengguna dengan ID tersebut tidak dapat dilihat' });
+      }
+      else {
+        res.status(201).json(response);
+      }
+    }
 
-
-    res.status(201).json(response);
   } catch (err) {
     console.log(err);
     res.status(500).json({ error: 'Terjadi kesalahan server' });
@@ -70,10 +71,6 @@ export const deleteUsers = async (req, res) => {
       return res.status(400).json({ error: 'ID harus berupa angka, misalnya 1-100.' });
     }
 
-    if (userId === '1') {
-      return res.status(400).json({ error: 'Tidak dapat menghapus pengguna dengan ID 1.' });
-    }
-
     const deletedUser = await Users.destroy({
       where: {
         id: userId
@@ -82,9 +79,14 @@ export const deleteUsers = async (req, res) => {
 
     if (deletedUser === 0) {
       return res.status(404).json({ error: 'Pengguna dengan ID tersebut tidak ditemukan.' });
+    }else {
+      if (deletedUser === 1) {
+        return res.status(400).json({ error: 'Tidak dapat menghapus pengguna dengan ID 1.' });
+      }
+      else {
+        res.status(201).json({ message: 'Penghapusan berhasil' });
+      }
     }
-
-    res.status(200).json({ message: 'Penghapusan berhasil' });
   } catch (err) {
     console.log(err);
     res.status(500).json({ error: 'Terjadi kesalahan server' });
