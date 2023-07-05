@@ -38,16 +38,4 @@ newSeq.sync().then(() => {
     console.log("sync error", err);
 })
 
-// export const createUsers = ((namaPrm, emailPrm, no_telpPrm, passwordPrm, rolePrm) => {
-//     const create = Users.create({
-//         nama: namaPrm,
-//         email: emailPrm,
-//         no_telp: no_telpPrm,
-//         password: passwordPrm,
-//         role: rolePrm
-//     })
-//     console.log("user" + create.id + "success");
-//     return create
-// })
-
 export default Users

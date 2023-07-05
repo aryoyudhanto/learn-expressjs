@@ -1,21 +1,10 @@
 import Users from "../models/users.model.js";
 import { Op } from 'sequelize';
-// import { createUsers } from "../models/users.model.js";
 
 export const postUsers = async (req, res) => {
-
-  // const resModel = createUsers(nama, email, no_telp, password, role)
   try {
-    const { nama, email, no_telp, password, role } = req.body;
+    const resModel = await Users.create(req.body)
 
-    const resModel = await Users.create({
-      id: null,
-      nama,
-      email,
-      no_telp,
-      password,
-      role
-    });
     res.status(201).json({
       msg: "User Created",
       User: resModel
@@ -24,22 +13,6 @@ export const postUsers = async (req, res) => {
     console.log(err);
     res.status(500).json({ error: 'Terjadi kesalahan server' });
   }
-  // if(!(nama&&email&&no_telp&&password)){
-  //     return res.status(400).json({
-  //         meta: "01-200",
-  //         message: "Failed add new user"
-  //     })
-  // }
-
-  // return res.status(200).json({
-  //     meta: {
-  //         code: "01-200",
-  //         message: "Success add new user"
-  //     },
-  //     data: {
-  //         id: resModel
-  //     }
-  // })
 
 };
 
@@ -67,6 +40,10 @@ export const getUserById = async (req, res) => {
       return res.status(400).json({ error: 'ID harus berupa angka, misalnya 1-100.' });
     }
 
+    if (userId === '1') {
+      return res.status(400).json({ error: 'Pengguna dengan ID tersebut tidak dapat dilihat' });
+    }
+
     const response = await Users.findOne({
       where: {
         id: userId,
@@ -74,7 +51,7 @@ export const getUserById = async (req, res) => {
     });
 
     if (!response) {
-      return res.status(400).json({ error: 'Pengguna dengan ID tersebut tidak ditemukan.' });
+      return res.status(400).json({ error: 'Pengguna dengan ID tersebut tidak dapat ditemukan.' });
     }
 
 
@@ -114,3 +91,41 @@ export const deleteUsers = async (req, res) => {
   }
 };
 
+export const updateUser = async (req, res) => {
+  try {
+    const userId = req.params.id;
+    const { nama, email, no_telp, password, role } = req.body;
+
+    if (isNaN(userId)) {
+      return res.status(400).json({ error: 'ID pengguna harus berupa angka.' });
+    }
+
+    if (userId === "1") {
+      return res.status(400).json({ error: 'ID 1 tidak dapat diubah' });
+    }
+
+    const user = await Users.findOne({
+      where: {
+        id: userId,
+      },
+    });
+
+    if (!user) {
+      return res.status(404).json({ error: 'Pengguna dengan ID tersebut tidak ditemukan.' });
+    }
+
+    // Memperbarui data pengguna
+    user.nama = nama;
+    user.email = email;
+    user.no_telp = no_telp;
+    user.password = password;
+    user.role = role;
+
+    await user.save(); // Menyimpan perubahan data pengguna ke database
+
+    res.status(200).json(user);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: 'Terjadi kesalahan server' });
+  }
+};
