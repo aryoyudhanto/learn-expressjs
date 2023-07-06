@@ -1,7 +1,7 @@
 import { Sequelize, DataTypes } from 'sequelize';
-import { define, sync } from '../config/connection.js';
+import newSeq from '../config/connection.js'
 
-const Details = define("user_details", {
+const Details = newSeq.define("user_details", {
     user_id: {
         type: DataTypes.INTEGER,
         references: {
@@ -18,15 +18,16 @@ const Details = define("user_details", {
         allowNull: false
     },
     no_telp: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.INTEGER(16),
     },
-    password: {
-        type: DataTypes.STRING,
-        allowNull: false
-    }
+
+}, {
+    Sequelize,
+    timestamps: false, // Menonaktifkan pembuatan kolom createdAt dan updatedAt
+    tableName: 'users_details'
 })
 
-sync().then(() => {
+newSeq.sync().then(() => {
     console.log('user_details tabel passed sync');
 }).catch((err) => {
     console.log("sync error", err);
